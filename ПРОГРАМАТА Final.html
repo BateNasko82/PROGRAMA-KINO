@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кино Програма</title>
+    <style>
+        :root {
+            --print-scale: 1;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #f8b500;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab.active {
+            background: #f8b500;
+            color: #000;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Стилове за въвеждане на програма */
+        .program-input-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .day-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .day-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .copy-day-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        
+        .copy-label {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .day-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .day-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .day-btn.active {
+            background: #f8b500;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            padding: 10px 20px;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #00d4a3;
+            transform: translateY(-2px);
+        }
+        
+        /* Автоматично попълване секция */
+        .auto-fill-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        
+        .auto-fill-section h3 {
+            color: #f8b500;
+            margin-bottom: 10px;
+        }
+        
+        .auto-fill-section textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-family: monospace;
+            margin-bottom: 10px;
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .auto-fill-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .auto-fill-btn {
+            padding: 12px 20px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .auto-fill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .hall-section {
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .hall-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #f8b500;
+            border-bottom: 2px solid #f8b500;
+            padding-bottom: 5px;
+        }
+        
+        .movie-entry {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .time-input, .movie-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+        
+        .time-input {
+            width: 100px;
+        }
+        
+        .movie-input {
+            flex-grow: 1;
+            min-width: 250px;
+        }
+        
+        .add-movie-btn, .save-btn, .load-btn, .edit-durations-btn {
+            padding: 12px 25px;
+            background: #f8b500;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .add-movie-btn:hover, .save-btn:hover, .load-btn:hover, .edit-durations-btn:hover {
+            background: #ffcc33;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .save-load-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .remove-btn {
+            padding: 8px 15px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .remove-btn:hover {
+            background: #ff6b81;
+        }
+        
+        /* Стилове за показване на програмата */
+        .live-program {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+        
+        .hall-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hall-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f8b500;
+            padding-bottom: 10px;
+        }
+        
+        .hall-name {
+            font-size: 1.8rem;
+            color: #f8b500;
+        }
+        
+        .current-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+        
+        .now-playing {
+            background: rgba(248, 181, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f8b500;
+        }
+        
+        .movie-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .time-info {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #f8b500;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #f8b500;
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        .time-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            color: #ccc;
+        }
+        
+        .next-movie {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 5px solid #00b894;
+        }
+        
+        .next-label {
+            font-size: 0.9rem;
+            color: #00b894;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .next-title {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .next-time {
+            font-size: 1.1rem;
+            color: #f8b500;
+        }
+        
+        /* Стилове за редактора на дължини */
+        .durations-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .duration-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .duration-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .duration-movie {
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        
+        .duration-input {
+            width: 100px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            margin-right: 10px;
+        }
+        
+        .duration-save-btn {
+            padding: 8px 15px;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .duration-save-btn:hover {
+            background: #00d4a3;
+        }
+        
+        /* Стилове за оформление (компактни) */
+        .formatting-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .format-controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .format-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+        }
+        
+        .format-control-group label {
+            font-size: 0.9rem;
+            color: #f8b500;
+            font-weight: bold;
+        }
+        
+        .format-select, .format-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 0.95rem;
+        }
+        
+        .format-textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+        
+        .format-btn {
+            padding: 12px 25px;
+            background: #00b894;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .format-btn:hover {
+            background: #00d4a3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .format-btn.export {
+            background: #9b59b6;
+        }
+        
+        .format-btn.export:hover {
+            background: #8e44ad;
+        }
+        
+        .format-btn.print {
+            background: #3498db;
+        }
+        
+        .format-btn.print:hover {
+            background: #2980b9;
+        }
+        
+        /* Програма за печат (компактна версия) */
+        .print-sheet {
+            background: white;
+            color: black;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+            transition: all 0.3s ease;
+        }
+        
+        .print-sheet.portrait {
+            width: 794px;
+            min-height: 1123px;
+        }
+        
+        .print-sheet.landscape {
+            width: 1123px;
+            min-height: 794px;
+        }
+        
+        .print-content {
+            padding: 15px 20px;
+            font-family: 'Arial', 'Arial Narrow', sans-serif;
+            line-height: 1.4;
+        }
+        
+        .print-content.scaled {
+            transform: scale(var(--print-scale));
+            transform-origin: top center;
+        }
+        
+        /* Компактни стилове за печат */
+        .print-header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #000;
+        }
+        
+        .print-header h2 {
+            margin: 0;
+            font-size: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        
+        .print-header p {
+            margin: 4px 0 0 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .print-halls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .print-hall {
+            flex: 1 1 280px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 6px;
+            background: #f9f9f9;
+            page-break-inside: avoid;
+        }
+        
+        .print-hall-title {
+            background: #000;
+            color: #fff;
+            margin: -6px -6px 6px -6px;
+            padding: 8px;
+            text-align: center;
+            font-size: 18px;
+            text-transform: uppercase;
+            border-radius: 3px 3px 0 0;
+            font-weight: bold;
+        }
+        
+        .print-film {
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .print-film:last-child {
+            border-bottom: none;
+        }
+        
+        .print-times {
+            font-size: 17px;
+            font-weight: bold;
+            color: #c00;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+        
+        .print-movie-title {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.3;
+            text-transform: uppercase;
+        }
+        
+        .print-movie-meta {
+            font-size: 13px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .print-day-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 2px;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        
+        .badge-work { background: #000; }
+        .badge-weekend { background: #888; }
+        
+        /* Контролен панел за печат */
+        .print-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .scale-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .scale-slider {
+            width: 130px;
+        }
+        
+        .copy-from-select, .copy-to-select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            min-width: 140px;
+        }
+        
+        .day-name {
+            display: inline-block;
+            width: 120px;
+            text-align: center;
+        }
+        
+        .week-selector-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(248, 181, 0, 0.2);
+        }
+        
+        .week-toggle {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 3px;
+        }
+        
+        .week-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .week-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .week-btn.active {
+            background: #f8b500;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(248, 181, 0, 0.3);
+        }
+        
+        /* Мобилни стилове */
+        @media (max-width: 900px) {
+            .print-sheet.portrait,
+            .print-sheet.landscape {
+                width: 100%;
+                min-height: auto;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                min-width: 100%;
+            }
+            
+            .format-controls {
+                flex-direction: column;
+            }
+            
+            .format-control-group {
+                width: 100%;
+            }
+            
+            .live-program {
+                grid-template-columns: 1fr;
+            }
+            
+            .day-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .week-selector-container {
+                width: 100% !important;
+                justify-content: space-between;
+            }
+            
+            .week-toggle {
+                flex: 1;
+            }
+            
+            .day-selector {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .copy-day-section {
+                width: 100%;
+                justify-content: center;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .copy-day-section select {
+                width: 100%;
+            }
+            
+            .movie-entry {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .time-input, .movie-input {
+                width: 100%;
+            }
+            
+            .auto-fill-buttons {
+                flex-direction: column;
+            }
+            
+            .auto-fill-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .print-halls {
+                flex-direction: column;
+            }
+            
+            .print-hall {
+                flex: 1 1 100%;
+            }
+            
+            .print-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #00b894;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: #ff4757;
+        }
+        
+        .notification.warning {
+            background: #f39c12;
+        }
+        
+        .auto-save-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #00b894;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .auto-save-status.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Кино Програма</h1>
+            <p class="subtitle">Мониторинг & Оформление </p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="live">🟢 Жива Програма</div>
+            <div class="tab" data-tab="input">📝 Въвеждане</div>
+            <div class="tab" data-tab="durations">⏱️ Дължини</div>
+            <div class="tab" data-tab="format">🖨️ Оформление</div>
+        </div>
+        
+        <!-- Таб за жива програма -->
+        <div id="live" class="tab-content active">
+            <div class="live-program" id="live-program-container">
+                <!-- Ще се генерира от JS -->
+            </div>
+        </div>
+        
+        <!-- Таб за въвеждане на програма -->
+        <div id="input" class="tab-content">
+            <div class="program-input-section">
+                <h2>Въвеждане на седмична програма</h2>
+                <p>Изберете ден и попълнете програмата за всяка зала</p>
+                
+                <div class="day-controls">
+                    <div class="week-selector-container">
+                        <label class="copy-label">Седмица:</label>
+                        <div class="week-toggle">
+                            <button class="week-btn active" data-week="0">Тази седмица</button>
+                            <button class="week-btn" data-week="1">Следваща седмица</button>
+                        </div>
+                    </div>
+                    
+                    <div class="day-selector">
+                        <button class="day-btn active" data-day="friday">Петък</button>
+                        <button class="day-btn" data-day="saturday">Събота</button>
+                        <button class="day-btn" data-day="sunday">Неделя</button>
+                        <button class="day-btn" data-day="monday">Понеделник</button>
+                        <button class="day-btn" data-day="tuesday">Вторник</button>
+                        <button class="day-btn" data-day="wednesday">Сряда</button>
+                        <button class="day-btn" data-day="thursday">Четвъртък</button>
+                    </div>
+                    
+                    <div class="copy-day-section">
+                        <span class="copy-label">Копирай от:</span>
+                        <select class="copy-from-select" id="copy-from">
+                            <option value="friday">Петък</option>
+                            <option value="saturday">Събота</option>
+                            <option value="sunday">Неделя</option>
+                            <option value="monday">Понеделник</option>
+                            <option value="tuesday">Вторник</option>
+                            <option value="wednesday">Сряда</option>
+                            <option value="thursday">Четвъртък</option>
+                        </select>
+                        
+                        <span class="copy-label">в:</span>
+                        <select class="copy-to-select" id="copy-to">
+                            <option value="friday">Петък</option>
+                            <option value="saturday">Събота</option>
+                            <option value="sunday">Неделя</option>
+                            <option value="monday">Понеделник</option>
+                            <option value="tuesday">Вторник</option>
+                            <option value="wednesday">Сряда</option>
+                            <option value="thursday">Четвъртък</option>
+                        </select>
+                        
+                        <button class="copy-btn" id="copy-program-btn">📋 Копирай Програма</button>
+                    </div>
+                </div>
+                
+                <!-- Автоматично попълване от текст -->
+                <div class="auto-fill-section">
+                    <h3>Автоматично попълване от текст</h3>
+                    <textarea id="auto-fill-text" rows="10"></textarea>
+                    <div class="auto-fill-buttons">
+                        <button class="auto-fill-btn" id="auto-fill-weekend" style="background: #9b59b6;">Попълни Събота/Неделя</button>
+                        <button class="auto-fill-btn" id="auto-fill-weekday" style="background: #3498db;">Попълни Пн-Пт (делник)</button>
+                        <button class="auto-fill-btn" id="auto-fill-clear" style="background: #e74c3c;">Изчисти Всичко</button>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">
+                        <strong>Забележка:</strong>Уикенд = събота и неделя<br>
+                        Формат: Време - Филм (един ред за всеки филм). Групирайте по зали с заглавия "зала 1 уикенд", "зала 1 делник" и т.н.
+                    </p>
+                </div>
+                
+                <div id="hall-inputs">
+                    <!-- Ще се генерира от JS -->
+                </div>
+                
+                <div class="save-load-section">
+                    <button class="save-btn" id="save-program">💾 Запази</button>
+                    <button class="load-btn" id="load-program">📂 Зареди</button>
+                    <button class="edit-durations-btn" id="go-to-durations">⏱️ Дължини</button>
+                    <button class="save-btn" id="export-btn">⬇️ Експорт</button>
+                    <button class="load-btn" id="import-btn">⬆️ Импорт</button>
+                    <input type="file" id="import-file" accept="application/json" style="display: none;">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Таб за дължини на филми -->
+        <div id="durations" class="tab-content">
+            <div class="durations-section">
+                <h2>Дължини на филми (ч:м:с или м:с)</h2>
+                <p>Тук можете да добавяте и редактирате дължините на филмите.</p>
+                
+                <div class="duration-list" id="duration-list">
+                    <!-- Ще се генерира от JS -->
+                </div>
+                
+                <div class="movie-entry">
+                    <input type="text" id="new-movie-name" class="movie-input" placeholder="Име на нов филм">
+                    <input type="text" id="new-movie-duration" class="duration-input" placeholder="Дължина">
+                    <button class="add-movie-btn" id="add-duration">➕ Добави</button>
+                </div>
+                
+                <div class="save-load-section">
+                    <button class="save-btn" id="save-durations">💾 Запази</button>
+                    <button class="load-btn" id="go-to-input">📝 Назад</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Таб за оформление за печат -->
+        <div id="format" class="tab-content">
+            <div class="formatting-section">
+                <h2>Оформление за печат</h2>
+                <p>Генерирайте и експортирайте програмата в подходящ формат за печат</p>
+                
+                <div class="format-controls">
+                    <div class="format-control-group">
+                        <label>От дата:</label>
+                        <input type="date" id="print-date-from" class="format-input">
+                    </div>
+                    
+                    <div class="format-control-group">
+                        <label>До дата:</label>
+                        <input type="date" id="print-date-to" class="format-input">
+                    </div>
+                    
+                    <div class="format-control-group">
+                        <label>Ориентация:</label>
+                        <select id="print-orientation" class="format-select">
+                            <option value="portrait">Портрет (вертикално)</option>
+                            <option value="landscape">Ландшафт (хоризонтално)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="format-control-group">
+                        <label>Мащаб:</label>
+                        <div class="scale-control">
+                            <input type="range" id="print-scale" class="scale-slider" min="0.8" max="2" step="0.1" value="1.3" oninput="updatePrintScale(this.value)">
+                            <span id="scale-value">130%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <textarea id="print-input" class="format-textarea" placeholder="Въведете програмата във формат:
+Зала 1 Делник
+14:00 - Филм 1 2D
+16:30 - Филм 2 3D
+
+Зала 1 Уикенд
+12:00 - Филм 3 2D
+15:00 - Филм 4 3D /събота и неделя/
+
+Зала 2 Делник
+15:00 - Филм 5 2D
+18:00 - Филм 6 3D
+
+Зала ЛУКС Уикенд
+13:00 - Филм 7 2D
+16:00 - Филм 8 3D"></textarea>
+                
+                <div class="print-controls">
+                    <button class="format-btn" onclick="generatePrintProgram()">🔄 Генерирай</button>
+                    <button class="format-btn print" onclick="printProgram()">🖨️ Печат</button>
+                    <button class="format-btn export" onclick="exportAsPDF()">📄 PDF</button>
+                    <button class="format-btn export" onclick="exportAsImage()">🖼️ JPG</button>
+                    <button class="format-btn" style="background: #e74c3c;" onclick="clearPrintPreview()">❌ Изчисти</button>
+                </div>
+                
+                <div id="print-preview-container" style="margin-top: 30px;">
+                    <!-- Тук ще се генерира прегледа -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="notification" id="notification">Съобщение</div>
+        <div class="auto-save-status" id="auto-save-status">Автоматично запазване...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <script>
+    // Комбиниран JavaScript код
+    // Всички функции от monitor.js + нови функции за оформление
+    
+    // ===== ЧАСТ 1: ОСНОВНИ ФУНКЦИИ ОТ MONITOR.JS =====
+    
+    // --- Utilities for week keys ---
+    function getISOWeekKeyFromDate(date) {
+        const tmp = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay()||7));
+        const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
+        const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1)/7);
+        return tmp.getUTCFullYear() + '-W' + String(weekNo).padStart(2,'0');
+    }
+    
+    function getWeekKeyForOffset(offset) {
+        const d = new Date();
+        d.setDate(d.getDate() + (offset * 7));
+        return getISOWeekKeyFromDate(d);
+    }
+    
+    // --- Data storage ---
+    let movieDurations = {};
+    let weeklyProgram = {};
+    
+    const daysOfWeek = {
+        friday: "Петък",
+        saturday: "Събота",
+        sunday: "Неделя",
+        monday: "Понеделник",
+        tuesday: "Вторник",
+        wednesday: "Сряда",
+        thursday: "Четвъртък"
+    };
+    
+    const defaultMovies = {
+        "ЧАРЛИ СУПЕРКУЧЕТО": 90 * 60,
+        "ЗООТРОПОЛИС 2": 108 * 60,
+        "ПРИСЛУЖНИЦАТА": 130 * 60,
+        "АВАТАР 3Д дуб.": 162 * 60,
+        "СНЕЖНАТА КРАЛИЦА": 95 * 60,
+        "СПОНДЖ БОБ": 90 * 60
+    };
+    
+    let selectedDay = 'friday';
+    let selectedWeekOffset = 0;
+    let liveUpdateInterval = null;
+    
+    // --- Duration parsing / formatting ---
+    function parseDurationToSeconds(input) {
+        if (input == null) return 0;
+        if (typeof input === 'number') return Math.max(0, Math.floor(input));
+        input = input.toString().trim(); if (input === '') return 0;
+        if (input.indexOf(':') >= 0) {
+            const parts = input.split(':').map(p=>parseInt(p,10));
+            if (parts.length === 3) return ((isNaN(parts[0])?0:parts[0])*3600) + ((isNaN(parts[1])?0:parts[1])*60) + (isNaN(parts[2])?0:parts[2]);
+            if (parts.length === 2) return ((isNaN(parts[0])?0:parts[0])*60) + (isNaN(parts[1])?0:parts[1]);
+        }
+        const num = parseFloat(input.replace(',','.'));
+        if (!isNaN(num)) return Math.round(num*60);
+        return 0;
+    }
+    
+    function formatDuration(seconds) { 
+        seconds = Math.max(0, Math.round(seconds)); 
+        const hrs = Math.floor(seconds/3600); 
+        const mins = Math.floor((seconds%3600)/60); 
+        const secs = seconds%60; 
+        if (hrs>0) return `${hrs}ч ${mins}м ${secs}с`; 
+        if (mins>0) return `${mins}м ${secs}с`; 
+        return `${secs}с`; 
+    }
+    
+    function formatTimeFromSeconds(seconds) { 
+        const hrs = Math.floor(seconds/3600).toString().padStart(2,'0'); 
+        const mins = Math.floor((seconds%3600)/60).toString().padStart(2,'0'); 
+        const secs = (seconds%60).toString().padStart(2,'0'); 
+        return `${hrs}:${mins}:${secs}`; 
+    }
+    
+    function formatTimeFromSecondsNoSec(seconds) { 
+        const hrs = Math.floor(seconds/3600).toString().padStart(2,'0'); 
+        const mins = Math.floor((seconds%3600)/60).toString().padStart(2,'0'); 
+        return `${hrs}:${mins}`; 
+    }
+    
+    // --- Helper to ensure week structure exists ---
+    function ensureWeek(weekKey) {
+        if (!weeklyProgram[weekKey]) {
+            weeklyProgram[weekKey] = {
+                friday: { hall1: [], hall2: [], hallLux: [] },
+                saturday: { hall1: [], hall2: [], hallLux: [] },
+                sunday: { hall1: [], hall2: [], hallLux: [] },
+                monday: { hall1: [], hall2: [], hallLux: [] },
+                tuesday: { hall1: [], hall2: [], hallLux: [] },
+                wednesday: { hall1: [], hall2: [], hallLux: [] },
+                thursday: { hall1: [], hall2: [], hallLux: [] }
+            };
+        }
+    }
+    
+    // --- Rendering / UI ---
+    function setupUI() {
+        const weekBtns = document.querySelectorAll('.week-btn');
+        weekBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedWeekOffset = parseInt(this.getAttribute('data-week'), 10);
+                renderHallInputs();
+            });
+        });
+        
+        const importFileInput = document.getElementById('import-file');
+        const importBtn = document.getElementById('import-btn');
+        const exportBtn = document.getElementById('export-btn');
+        
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportData);
+        }
+        
+        if (importBtn) {
+            importBtn.addEventListener('click', () => {
+                if (importFileInput) importFileInput.click();
+            });
+        }
+        
+        if (importFileInput) {
+            importFileInput.addEventListener('change', function(e) {
+                const f = e.target.files[0];
+                if (f) {
+                    const r = new FileReader();
+                    r.onload = () => {
+                        try {
+                            const parsed = JSON.parse(r.result);
+                            importData(parsed);
+                            showNotification('Данните са импортирани успешно!');
+                        } catch(err) {
+                            showNotification('Невалиден JSON файл', 'error');
+                        }
+                    };
+                    r.readAsText(f);
+                }
+            });
+        }
+    }
+    
+    function renderHallInputs() {
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+        ensureWeek(weekKey);
+        const hallInputsContainer = document.getElementById('hall-inputs');
+        hallInputsContainer.innerHTML = '';
+        const dayTitle = document.createElement('h3');
+        dayTitle.style.color = '#f8b500'; dayTitle.style.marginBottom = '20px'; dayTitle.style.fontSize = '1.8rem';
+        dayTitle.textContent = `Програма за ${daysOfWeek[selectedDay]} (${weekKey})`;
+        hallInputsContainer.appendChild(dayTitle);
+    
+        const makeHall = (hallKey, title) => {
+            let html = `<div class="hall-section"><div class="hall-title">${title}</div><div id="${hallKey}-movies">`;
+            weeklyProgram[weekKey][selectedDay][hallKey].forEach((movie, index) => {
+                html += createMovieEntryHTML(hallKey, index, movie.time || '', movie.name || '', movie.ad || 0);
+            });
+            html += `</div><button class="add-movie-btn" onclick="addMovieEntry('${hallKey}')">➕ Добави филм</button></div>`;
+            return html;
+        };
+    
+        hallInputsContainer.innerHTML = makeHall('hall1','🎭 Зала 1') + makeHall('hall2','🎭 Зала 2') + makeHall('hallLux','⭐ Зала ЛУКС');
+    }
+    
+    function createMovieEntryHTML(hall, index, time = '', name = '', adSeconds = 0) {
+        const adDisplay = adSeconds ? formatTimeFromSeconds(adSeconds) : '';
+        return `
+            <div class="movie-entry" id="${hall}-movie-${index}">
+                <input type="time" class="time-input" value="${time}" onchange="updateProgram('${hall}', ${index}, 'time', this.value)">
+                <input type="text" class="movie-input" value="${name}" placeholder="Име на филм" list="movie-suggestions" onchange="updateProgram('${hall}', ${index}, 'name', this.value)">
+                <input type="text" class="duration-input" placeholder="Рекламен блок (м:с или ч:м:с)" value="${adDisplay}" onchange="updateProgram('${hall}', ${index}, 'ad', this.value)" style="width:120px;">
+                <button class="remove-btn" onclick="removeMovieEntry('${hall}', ${index})">❌ Премахни</button>
+            </div>
+        `;
+    }
+    
+    function addMovieEntry(hall) {
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+        ensureWeek(weekKey);
+        const movies = weeklyProgram[weekKey][selectedDay][hall];
+        const newIndex = movies.length;
+        movies.push({ time: '', name: '', ad: 0 });
+        renderHallInputs();
+        setTimeout(() => { const newInput = document.querySelector(`#${hall}-movie-${newIndex} .movie-input`); if (newInput) newInput.focus(); }, 100);
+    }
+    
+    function removeMovieEntry(hall, index) { 
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset); 
+        weeklyProgram[weekKey][selectedDay][hall].splice(index,1); 
+        renderHallInputs(); 
+    }
+    
+    function updateProgram(hall, index, field, value) {
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+        ensureWeek(weekKey);
+        if (!weeklyProgram[weekKey][selectedDay][hall][index]) weeklyProgram[weekKey][selectedDay][hall][index] = {};
+        if (field === 'ad') {
+            weeklyProgram[weekKey][selectedDay][hall][index][field] = parseDurationToSeconds(value);
+        } else {
+            weeklyProgram[weekKey][selectedDay][hall][index][field] = value;
+        }
+    }
+    
+    // --- Durations UI ---
+    function renderDurationList() {
+        const durationList = document.getElementById('duration-list');
+        durationList.innerHTML = '';
+    
+        const sortedMovies = Object.keys(movieDurations).sort();
+        sortedMovies.forEach(movieName => {
+            const durationItem = document.createElement('div');
+            durationItem.className = 'duration-item';
+            const valueStr = formatTimeFromSeconds(movieDurations[movieName] || 0);
+            durationItem.innerHTML = `<div class="duration-movie">${movieName}</div><input type="text" class="duration-input" value="${valueStr}" data-movie="${movieName}"><button class="duration-save-btn" onclick="saveDuration('${movieName}', this.previousElementSibling.value)">💾</button>`;
+            durationList.appendChild(durationItem);
+        });
+    }
+    
+    function saveDuration(movieName, durationInput) {
+        const seconds = parseDurationToSeconds(durationInput);
+        if (seconds <= 0) { showNotification('Моля, въведете валидна дължина!', 'error'); return; }
+        movieDurations[movieName] = seconds;
+        saveDurationsToStorage();
+        renderDurationList();
+        showNotification(`Дължината на "${movieName}" е запазена (${formatDuration(seconds)})!`);
+    }
+    
+    function setupAddDurationButton() {
+        document.getElementById('add-duration')?.addEventListener('click', function() {
+            const movieName = document.getElementById('new-movie-name').value.trim();
+            const duration = document.getElementById('new-movie-duration').value;
+            if (!movieName) { showNotification('Моля, въведете име на филм!', 'error'); return; }
+            movieDurations[movieName] = parseDurationToSeconds(duration);
+            saveDurationsToStorage();
+            renderDurationList();
+            document.getElementById('new-movie-name').value = '';
+            document.getElementById('new-movie-duration').value = '';
+            document.getElementById('new-movie-name').focus();
+        });
+    }
+    
+    // --- Sound alert functions ---
+    let lastMovieId = null; // За проследяване на кой филм е активен
+    let movieStartAlerts = {}; // За проследяване на филми, които са изпълнили стартовия сигнал
+    let movieEndAlerts = {}; // За проследяване на филми, които са изпълнили сигнала за край
+    
+    function playStartSound() {
+        // Стартов звук - бърз и светъл звук (биберон подобен на часовник)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Три бърза издумки за стартов звук
+        oscillator.frequency.setValueAtTime(800, now);
+        gainNode.gain.setValueAtTime(0.8, now);
+        oscillator.frequency.setValueAtTime(1000, now + 0.1);
+        gainNode.gain.setValueAtTime(0.8, now + 0.1);
+        oscillator.frequency.setValueAtTime(1200, now + 0.2);
+        gainNode.gain.setValueAtTime(0, now + 0.3);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.3);
+    }
+    
+    function playEndSound() {
+        // Звук за край - по-нисък и по-траен (предупреждаващ звук)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Два по-нискочестотни издумки
+        oscillator.frequency.setValueAtTime(300, now);
+        gainNode.gain.setValueAtTime(0.8, now);
+        oscillator.frequency.setValueAtTime(250, now + 0.2);
+        gainNode.gain.setValueAtTime(0.8, now + 0.2);
+        gainNode.gain.setValueAtTime(0, now + 0.5);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.5);
+    }
+    
+    // --- Live program rendering ---
+    function updateLiveProgram() {
+        const now = new Date();
+        const currentTime = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+        const dayOfWeek = now.getDay();
+        const dayMapping = {0:'sunday',1:'monday',2:'tuesday',3:'wednesday',4:'thursday',5:'friday',6:'saturday'};
+        const dayKey = dayMapping[dayOfWeek];
+    
+        const currentWeekKey = getISOWeekKeyFromDate(now);
+        ensureWeek(currentWeekKey);
+        const todayProgram = weeklyProgram[currentWeekKey] || {};
+        const liveContainer = document.getElementById('live-program-container');
+    
+        if (!todayProgram || Object.keys(todayProgram).length === 0) {
+            liveContainer.innerHTML = '<div class="hall-display" style="grid-column: 1/-1; text-align: center; padding: 40px;"><h2>Няма програма за днес</h2><p>Моля, въведете програма в раздела "Въвеждане на Програма"</p></div>';
+            return;
+        }
+    
+        let html = '';
+        for (const [hallKey, hallName] of [['hall1','Зала 1'],['hall2','Зала 2'],['hallLux','Зала ЛУКС']]) {
+            const movies = (todayProgram[dayKey] && todayProgram[dayKey][hallKey]) ? todayProgram[dayKey][hallKey] : [];
+            if (!movies || movies.length === 0) { html += `<div class="hall-display"><div class="hall-header"><div class="hall-name">${hallName}</div><div class="current-time">${formatTime(now)}</div></div><div class="now-playing"><div class="movie-title">Няма програма за днес</div><div class="time-info">${daysOfWeek[dayKey]}</div></div></div>`; continue; }
+    
+            let currentMovie = null, nextMovie = null, currentProgress = 0, timeElapsed = 0, timeRemaining = 0;
+            for (let i=0;i<movies.length;i++) {
+                const movie = movies[i]; if (!movie.time || !movie.name) continue;
+                const [hours, minutes] = movie.time.split(':').map(Number);
+                const movieStartTime = (hours||0)*3600 + (minutes||0)*60;
+                const movieDuration = movieDurations[movie.name] || (120*60);
+                const adSeconds = movie.ad ? parseInt(movie.ad,10)||0 : 0;
+                const movieEndTime = movieStartTime + movieDuration;
+                const movieEndWithAds = movieEndTime + adSeconds;
+    
+                if (currentTime >= movieStartTime && currentTime < movieEndWithAds) {
+                    currentMovie = {...movie, startTime: movieStartTime, endTime: movieEndTime, endWithAds: movieEndWithAds, duration: movieDuration, ad: adSeconds};
+                    timeElapsed = currentTime - movieStartTime;
+                    timeRemaining = movieEndWithAds - currentTime;
+                    currentProgress = (timeElapsed / (movieDuration + adSeconds)) * 100;
+                    if (i+1 < movies.length) nextMovie = movies[i+1];
+                    break;
+                } else if (currentTime < movieStartTime) { nextMovie = movie; break; }
+            }
+    
+            if (!currentMovie && !nextMovie && movies.length>0) {
+                for (let i=0;i<movies.length;i++) { if (movies[i].time && movies[i].name) { const [h,m] = movies[i].time.split(':').map(Number); const movieStart=(h||0)*3600+(m||0)*60; if (movieStart>currentTime) { nextMovie = movies[i]; break; } }}
+            }
+    
+            html += `<div class="hall-display"><div class="hall-header"><div class="hall-name">${hallName}</div><div class="current-time">${formatTime(now)}</div></div><div class="day-indicator" style="margin-bottom:15px;color:#f8b500;font-size:1.1rem;">${daysOfWeek[dayKey]}</div>`;
+    
+            if (currentMovie) {
+                html += `<div class="now-playing"><div class="movie-title">${currentMovie.name}</div><div class="time-info">${formatDuration(timeElapsed)} / ${formatDuration(currentMovie.duration)}</div><div class="progress-bar"><div class="progress" style="width: ${currentProgress}%"></div></div><div class="time-details"><span>Започна: ${formatTimeFromSecondsNoSec(currentMovie.startTime)}</span><span>Свършва: ${formatTimeFromSecondsNoSec(currentMovie.endTime)}</span></div><div class="time-details"><span>Свършва: ${formatTimeFromSecondsNoSec(currentMovie.endWithAds)}</span><span>Остава: ${formatDuration(timeRemaining)}</span></div></div>`;
+                
+                // Проверка за звукови сигнали
+                const movieId = hallKey + '-' + currentMovie.startTime + '-' + currentMovie.name;
+                
+                // Сигнал при започване на филм
+                if (timeElapsed >= 0 && timeElapsed < 2 && !movieStartAlerts[movieId]) {
+                    playStartSound();
+                    movieStartAlerts[movieId] = true;
+                    showNotification(`🎬 Филмът "${currentMovie.name}" започна!`);
+                }
+                
+                // Сигнал минута преди свършване на филм
+                const secondsUntilEnd = currentMovie.endWithAds - currentTime;
+                if (secondsUntilEnd > 55 && secondsUntilEnd <= 60 && !movieEndAlerts[movieId]) {
+                    playEndSound();
+                    movieEndAlerts[movieId] = true;
+                    showNotification(`⏰ Филмът "${currentMovie.name}" свършва в 1 минута!`);
+                }
+            } else { html += `<div class="now-playing"><div class="movie-title">В момента няма прожекция</div></div>`; }
+    
+            if (nextMovie) {
+                const [nh,nm] = nextMovie.time.split(':').map(Number); const nextStart=(nh||0)*3600+(nm||0)*60; const timeUntilNext = nextStart - currentTime;
+                html += `<div class="next-movie"><div class="next-label">Следва</div><div class="next-title">${nextMovie.name}</div><div class="next-time">${nextMovie.time} (започва след ${formatDuration(timeUntilNext)})</div></div>`;
+            }
+    
+            html += `</div>`;
+        }
+    
+        liveContainer.innerHTML = html;
+    }
+    
+    function startLiveProgram() { if (liveUpdateInterval) clearInterval(liveUpdateInterval); updateLiveProgram(); liveUpdateInterval = setInterval(updateLiveProgram, 1000); }
+    function stopLiveProgram() { if (liveUpdateInterval) { clearInterval(liveUpdateInterval); liveUpdateInterval = null; } }
+    
+    function setupEventListeners() {
+        document.getElementById('save-program')?.addEventListener('click', function(){ saveProgramToStorage(); showNotification('Програмата е запазена успешно!'); });
+        document.getElementById('load-program')?.addEventListener('click', function(){ loadProgramFromStorage(); renderHallInputs(); showNotification('Програмата е заредена успешно!'); });
+        document.getElementById('go-to-durations')?.addEventListener('click', function(){ switchTab('durations'); });
+        document.getElementById('go-to-input')?.addEventListener('click', function(){ switchTab('input'); });
+        document.addEventListener('keydown', function(e){ if (e.target.classList.contains('duration-input') && e.key === 'Enter') { const movieName = e.target.getAttribute('data-movie'); if (movieName) saveDuration(movieName, e.target.value); } });
+        document.querySelectorAll('.day-btn').forEach(btn=>{ btn.addEventListener('click', function(){ document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active'); selectedDay = this.getAttribute('data-day'); document.getElementById('copy-from').value = selectedDay; renderHallInputs(); }); });
+        
+        // Слушател за промяна на ориентацията
+        document.getElementById('print-orientation')?.addEventListener('change', function() {
+            const sheet = document.querySelector('.print-sheet');
+            if (sheet) {
+                sheet.classList.remove('portrait', 'landscape');
+                sheet.classList.add(this.value);
+            }
+        });
+    }
+    
+    function formatTime(date) { return date.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' }); }
+    
+    function showNotification(message, type = 'success') { 
+        const notification = document.getElementById('notification'); 
+        notification.textContent = message; 
+        notification.className = 'notification'; 
+        if (type === 'error') notification.classList.add('error');
+        else if (type === 'warning') notification.classList.add('warning');
+        notification.classList.add('show'); 
+        setTimeout(()=>{ notification.classList.remove('show'); }, 3000); 
+    }
+    
+    // --- Storage ---
+    function saveDurationsToStorage() { 
+        try { 
+            localStorage.setItem('cinemaMovieDurations', JSON.stringify(movieDurations)); 
+            return true; 
+        } catch(e) { 
+            console.error('Грешка при запазване на дължините:', e); 
+            return false; 
+        } 
+    }
+    
+    function loadDurationsFromStorage() {
+        try {
+            const saved = localStorage.getItem('cinemaMovieDurations');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                movieDurations = {};
+                for (const k in parsed) {
+                    const v = parsed[k];
+                    if (typeof v === 'number') {
+                        if (v > 1000) movieDurations[k] = Math.round(v);
+                        else movieDurations[k] = Math.round(v * 60);
+                    } else if (typeof v === 'string') {
+                        movieDurations[k] = parseDurationToSeconds(v);
+                    }
+                }
+            } else {
+                movieDurations = { ...defaultMovies };
+                saveDurationsToStorage();
+            }
+        } catch (e) { 
+            console.error('Грешка при зареждане на дължините:', e); 
+            movieDurations = { ...defaultMovies }; 
+        }
+    }
+    
+    function saveProgramToStorage() { 
+        try { 
+            localStorage.setItem('cinemaWeeklyProgramByWeek', JSON.stringify(weeklyProgram)); 
+            return true; 
+        } catch(e) { 
+            console.error('Грешка при запазване на програмата:', e); 
+            return false; 
+        } 
+    }
+    
+    function loadProgramFromStorage() { 
+        try { 
+            const saved = localStorage.getItem('cinemaWeeklyProgramByWeek'); 
+            if (saved) weeklyProgram = JSON.parse(saved); 
+            else weeklyProgram = {}; 
+        } catch(e) { 
+            console.error('Грешка при зареждане на програмата:', e); 
+            weeklyProgram = {}; 
+        } 
+    }
+    
+    // --- Auto-fill functionality ---
+    function setupAutoFill() {
+        document.getElementById('auto-fill-weekend')?.addEventListener('click', function() {
+            const text = document.getElementById('auto-fill-text').value;
+            if (!text.trim()) {
+                showNotification('Моля, въведете текст с програмата!', 'error');
+                return;
+            }
+            parseAndFillProgram(text, true);
+            showNotification('Уикенд програмата (събота/неделя) е попълнена успешно!');
+        });
+        
+        document.getElementById('auto-fill-weekday')?.addEventListener('click', function() {
+            const text = document.getElementById('auto-fill-text').value;
+            if (!text.trim()) {
+                showNotification('Моля, въведете текст с програмата!', 'error');
+                return;
+            }
+            parseAndFillProgram(text, false);
+            showNotification('Делник програмата (понеделник-петък) е попълнена успешно!');
+        });
+        
+        document.getElementById('auto-fill-clear')?.addEventListener('click', function() {
+            if (confirm('Сигурни ли сте, че искате да изчистите цялата програма за избрания ден?')) {
+                clearCurrentDayProgram();
+                showNotification('Програмата е изчистена!');
+            }
+        });
+    }
+    
+    function parseAndFillProgram(text, isWeekend) {
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+        ensureWeek(weekKey);
+        
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+        let currentHall = null;
+        let hallType = null;
+        
+        for (const line of lines) {
+            const lowerLine = line.toLowerCase();
+            
+            if (lowerLine.includes('зала')) {
+                if (lowerLine.includes('зала 1')) {
+                    currentHall = 'hall1';
+                } else if (lowerLine.includes('зала 2')) {
+                    currentHall = 'hall2';
+                } else if (lowerLine.includes('зала лук') || lowerLine.includes('залалукс')) {
+                    currentHall = 'hallLux';
+                }
+                
+                if (lowerLine.includes('уикенд')) {
+                    hallType = 'weekend';
+                } else if (lowerLine.includes('делник')) {
+                    hallType = 'weekday';
+                } else {
+                    hallType = null;
+                }
+                
+                continue;
+            }
+            
+            if (!currentHall || !hallType) continue;
+            if ((isWeekend && hallType !== 'weekend') || (!isWeekend && hallType !== 'weekday')) {
+                continue;
+            }
+            
+            const match = line.match(/(\d{1,2}:\d{2})\s*[-–]\s*(.+)/);
+            if (match) {
+                const time = match[1];
+                const movie = match[2].trim();
+                
+                const targetDays = isWeekend ? 
+                    ['saturday', 'sunday'] :
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                
+                targetDays.forEach(day => {
+                    weeklyProgram[weekKey][day][currentHall].push({
+                        time: time,
+                        name: movie,
+                        ad: 0
+                    });
+                });
+            }
+        }
+        
+        renderHallInputs();
+        saveProgramToStorage();
+    }
+    
+    function clearCurrentDayProgram() {
+        const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+        ensureWeek(weekKey);
+        
+        for (const hall of ['hall1', 'hall2', 'hallLux']) {
+            weeklyProgram[weekKey][selectedDay][hall] = [];
+        }
+        
+        renderHallInputs();
+        saveProgramToStorage();
+    }
+    
+    function setupExampleProgram() {
+        // Пример програма премахнета
+    }
+    
+    // Export / Import
+    function exportData() {
+        const data = { movieDurations, weeklyProgram };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); 
+        a.href = url; 
+        a.download = 'cinema-program-export.json'; 
+        document.body.appendChild(a); 
+        a.click(); 
+        a.remove(); 
+        URL.revokeObjectURL(url);
+        showNotification('Данните са експортирани успешно!');
+    }
+    
+    function importData(parsed) {
+        if (parsed.movieDurations) movieDurations = parsed.movieDurations;
+        if (parsed.weeklyProgram) weeklyProgram = parsed.weeklyProgram;
+        saveDurationsToStorage(); 
+        saveProgramToStorage(); 
+        renderDurationList(); 
+        renderHallInputs();
+    }
+    
+    function setupMovieSuggestions() {
+        const movieSuggestions = Object.keys(defaultMovies).concat(Object.keys(movieDurations));
+        const uniqueSuggestions = [...new Set(movieSuggestions)];
+        const datalist = document.createElement('datalist'); 
+        datalist.id = 'movie-suggestions';
+        uniqueSuggestions.forEach(movie => { 
+            const option = document.createElement('option'); 
+            option.value = movie; 
+            datalist.appendChild(option); 
+        });
+        document.body.appendChild(datalist);
+    }
+    
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => { 
+            tab.addEventListener('click', function() { 
+                const tabId = this.getAttribute('data-tab'); 
+                tabs.forEach(t => t.classList.remove('active')); 
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active')); 
+                this.classList.add('active'); 
+                document.getElementById(tabId).classList.add('active'); 
+                if (tabId === 'live') startLiveProgram(); 
+                else stopLiveProgram(); 
+            }); 
+        });
+    }
+    
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        if (tabId === 'live') startLiveProgram();
+        else stopLiveProgram();
+    }
+    
+    function setupDaySelector() {
+        const dayButtons = document.querySelectorAll('.day-btn');
+        dayButtons.forEach(btn => { 
+            btn.addEventListener('click', function() { 
+                document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active')); 
+                this.classList.add('active'); 
+                selectedDay = this.getAttribute('data-day'); 
+                document.getElementById('copy-from').value = selectedDay; 
+                renderHallInputs(); 
+            }); 
+        });
+    }
+    
+    function setupCopyFunctionality() {
+        document.getElementById('copy-from').value = selectedDay;
+        document.getElementById('copy-to').value = selectedDay;
+        document.getElementById('copy-program-btn').addEventListener('click', function() {
+            const fromDay = document.getElementById('copy-from').value;
+            const toDay = document.getElementById('copy-to').value;
+            const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+            if (fromDay === toDay) { 
+                showNotification('Не можете да копирате програмата в същия ден!', 'error'); 
+                return; 
+            }
+            if (!confirm(`Копиране от ${daysOfWeek[fromDay]} в ${daysOfWeek[toDay]} за седмица ${weekKey}?`)) return;
+            ensureWeek(weekKey);
+            for (const hall of ['hall1','hall2','hallLux']) 
+                weeklyProgram[weekKey][toDay][hall] = JSON.parse(JSON.stringify(weeklyProgram[weekKey][fromDay][hall]));
+            renderHallInputs(); 
+            saveProgramToStorage(); 
+            showNotification('Копиране успешно!');
+        });
+    }
+    
+    // ===== ЧАСТ 2: ФУНКЦИИ ЗА ОФОРМЛЕНИЕ =====
+    
+    let printDurationsDB = JSON.parse(localStorage.getItem('kinoDB') || '{}');
+    
+    function updatePrintScale(value) {
+        const scaleValue = parseFloat(value);
+        document.documentElement.style.setProperty('--print-scale', scaleValue);
+        document.getElementById('scale-value').textContent = Math.round(scaleValue * 100) + '%';
+    }
+    
+    function parsePrintInput(text) {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+        let halls = [];
+        let curHall = null;
+        let curDayType = 'all';
+        
+        lines.forEach(line => {
+            if(/^зала\s+/i.test(line)) {
+                const hallName = line;
+                curHall = { name: hallName, films: {} };
+                halls.push(curHall);
+                
+                if(hallName.toLowerCase().includes('уикенд')) {
+                    curDayType = 'weekend';
+                } else if(hallName.toLowerCase().includes('делник')) {
+                    curDayType = 'work';
+                } else {
+                    curDayType = 'all';
+                }
+                return;
+            }
+            
+            if(/делнични|делник/i.test(line)) { 
+                curDayType = 'work'; 
+                return; 
+            }
+            if(/уикенд/i.test(line)) { 
+                curDayType = 'weekend'; 
+                return; 
+            }
+            
+            const m = line.match(/(\d{1,2}:\d{2})\s*-\s*(.*)/);
+            if(m && curHall) {
+                const time = m[1];
+                let fullTitle = m[2];
+                
+                const weekendOnly = fullTitle.includes('/събота и неделя/');
+                const fmt = (fullTitle.match(/\b(2D|3D|2Д|3Д)\b/i) || [""])[0].toUpperCase().replace('Д','D');
+                
+                let cleanTitle = fullTitle.replace(/\b(2D|3D|2Д|3Д)\b/i, '')
+                                         .replace(/\/събота и неделя\//gi, '')
+                                         .replace(/\s*дуб\.?/i, '')
+                                         .trim();
+                
+                const key = cleanTitle + '|' + fmt + '|' + weekendOnly;
+                
+                if(!curHall.films[key]) {
+                    curHall.films[key] = { 
+                        title: cleanTitle, 
+                        fmt, 
+                        weekendOnly,
+                        workTimes: [], 
+                        weekendTimes: [], 
+                        allTimes: [] 
+                    };
+                }
+                
+                if(weekendOnly) {
+                    curHall.films[key].weekendTimes.push(time);
+                } else if(curDayType === 'work') {
+                    curHall.films[key].workTimes.push(time);
+                } else if(curDayType === 'weekend') {
+                    curHall.films[key].weekendTimes.push(time);
+                } else {
+                    curHall.films[key].allTimes.push(time);
+                }
+            }
+        });
+        return halls;
+    }
+    
+    function formatPrintTimes(timesArray, separator = ' | ') {
+        if (!timesArray || timesArray.length === 0) return '';
+        return timesArray.join(separator);
+    }
+    
+    function generatePrintProgram() {
+        const input = document.getElementById('print-input').value;
+        if (!input.trim()) {
+            showNotification('Моля, въведете програма!', 'error');
+            return;
+        }
+        
+        const halls = parsePrintInput(input);
+        const from = document.getElementById('print-date-from').value;
+        const to = document.getElementById('print-date-to').value;
+        const orientation = document.getElementById('print-orientation').value;
+        
+        const fromText = from || "начална дата";
+        const toText = to || "крайна дата";
+        
+        let html = `<div class="print-sheet ${orientation}">
+            <div class="print-content scaled">
+                <div class="print-header">
+                    <h2>Кино Еккоплекс</h2>
+                    <p>Програма за ${fromText} - ${toText} | Тел: 032 644 004</p>
+                </div>
+                <div class="print-halls">`;
+        
+        halls.forEach(h => {
+            let hallTitle = h.name.toUpperCase();
+            html += `<div class="print-hall">
+                <div class="print-hall-title">${hallTitle}</div>`;
+            
+            const films = Object.values(h.films);
+            if(films.length === 0) {
+                html += `<div class="print-film">Няма програма</div>`;
+            } else {
+                films.sort((a, b) => {
+                    const aTime = a.workTimes[0] || a.weekendTimes[0] || a.allTimes[0] || '23:59';
+                    const bTime = b.workTimes[0] || b.weekendTimes[0] || b.allTimes[0] || '23:59';
+                    return aTime.localeCompare(bTime);
+                });
+                
+                films.forEach(f => {
+                    const dur = printDurationsDB[f.title] || "";
+                    
+                    html += `<div class="print-film">`;
+                    
+                    const isWeekendHall = h.name.toLowerCase().includes('уикенд');
+                    const isWorkHall = h.name.toLowerCase().includes('делник');
+                    
+                    if (isWeekendHall) {
+                        if (f.weekendTimes.length > 0) {
+                            html += `<div class="print-times">${formatPrintTimes(f.weekendTimes, ' | ')}</div>`;
+                        } else if (f.allTimes.length > 0) {
+                            html += `<div class="print-times">${formatPrintTimes(f.allTimes, ' | ')}</div>`;
+                        }
+                    }
+                    else if (isWorkHall) {
+                        if (f.workTimes.length > 0) {
+                            html += `<div class="print-times">${formatPrintTimes(f.workTimes, ' | ')}</div>`;
+                        } else if (f.allTimes.length > 0) {
+                            html += `<div class="print-times">${formatPrintTimes(f.allTimes, ' | ')}</div>`;
+                        }
+                    }
+                    else {
+                        let hasContent = false;
+                        
+                        if (f.weekendTimes.length > 0 && f.weekendOnly) {
+                            html += `<div class="print-times">${formatPrintTimes(f.weekendTimes, ' | ')} <span style="color:#666;font-style:italic;font-size:0.8em;">/събота и неделя/</span></div>`;
+                            hasContent = true;
+                        }
+                        
+                        if (f.workTimes.length > 0) {
+                            if (hasContent) html += `<br>`;
+                            html += `<div class="print-times">${formatPrintTimes(f.workTimes, ' | ')}</div>`;
+                            hasContent = true;
+                        }
+                        
+                        if (f.allTimes.length > 0 && !f.weekendOnly) {
+                            if (hasContent) html += `<br>`;
+                            html += `<div class="print-times">${formatPrintTimes(f.allTimes, ' | ')}</div>`;
+                            hasContent = true;
+                        }
+                    }
+                    
+                    html += `<div class="print-movie-title">${f.title}</div>`;
+                    if (f.fmt || dur) {
+                        html += `<div class="print-movie-meta">`;
+                        if (f.fmt) html += `<span style="color:#c00;font-weight:bold;">${f.fmt}</span>`;
+                        if (dur) html += `<span style="margin-left:8px;color:#666;">• ${dur}</span>`;
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+            }
+            html += `</div>`;
+        });
+        
+        html += `</div></div></div>`;
+        
+        document.getElementById('print-preview-container').innerHTML = html;
+        showNotification('Програмата е генерирана успешно!');
+    }
+    
+    function printProgram() {
+        const preview = document.getElementById('print-preview-container').querySelector('.print-sheet');
+        if (!preview) {
+            showNotification('Моля, генерирайте първо програмата!', 'error');
+            return;
+        }
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Печат на програма</title>
+                <style>
+                    :root {
+                        --print-scale: 1;
+                    }
+                    
+                    body { 
+                        margin: 0; 
+                        padding: 20px; 
+                        background: white;
+                        font-family: 'Arial', sans-serif;
+                    }
+                    
+                    @media print {
+                        @page { 
+                            margin: 5mm;
+                            size: A4;
+                        }
+                        
+                        body { 
+                            margin: 0; 
+                            padding: 0;
+                            background: white;
+                        }
+                        
+                        .print-sheet { 
+                            box-shadow: none !important;
+                            margin: 0 !important;
+                            width: 100% !important;
+                            min-height: auto !important;
+                        }
+                        
+                        .print-content {
+                            padding: 15px 20px;
+                            font-size: 11pt;
+                            line-height: 1.4;
+                        }
+                        
+                        .print-header h2 {
+                            font-size: 20pt;
+                            font-weight: bold;
+                        }
+                        
+                        .print-header p {
+                            font-size: 13pt;
+                        }
+                        
+                        .print-hall-title {
+                            font-size: 14pt;
+                            font-weight: bold;
+                        }
+                        
+                        .print-times {
+                            font-size: 13pt;
+                            font-weight: bold;
+                        }
+                        
+                        .print-movie-title {
+                            font-size: 12pt;
+                            font-weight: bold;
+                        }
+                        
+                        .print-movie-meta {
+                            font-size: 10pt;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                ${preview.outerHTML}
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        setTimeout(function() {
+                            window.close();
+                        }, 1000);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+    
+    async function exportAsPDF() {
+        const preview = document.getElementById('print-preview-container').querySelector('.print-sheet');
+        if (!preview) {
+            showNotification('Моля, генерирайте първо програмата!', 'error');
+            return;
+        }
+        
+        try {
+            const canvas = await html2canvas(preview, { 
+                scale: 2,
+                backgroundColor: '#ffffff'
+            });
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            
+            const { jsPDF } = window.jspdf;
+            const orientation = document.getElementById('print-orientation').value;
+            const pdf = new jsPDF({
+                orientation: orientation === 'landscape' ? 'l' : 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            const imgWidth = 190;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            const xPos = (210 - imgWidth) / 2;
+            const yPos = (297 - imgHeight) / 2;
+            
+            pdf.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+            pdf.save('kino-programa.pdf');
+            showNotification('PDF файлът е изтеглен!');
+        } catch (error) {
+            showNotification('Грешка при експорт на PDF: ' + error.message, 'error');
+        }
+    }
+    
+    async function exportAsImage() {
+        const preview = document.getElementById('print-preview-container').querySelector('.print-sheet');
+        if (!preview) {
+            showNotification('Моля, генерирайте първо програмата!', 'error');
+            return;
+        }
+        
+        try {
+            const canvas = await html2canvas(preview, { 
+                scale: 2,
+                backgroundColor: '#ffffff'
+            });
+            const link = document.createElement('a');
+            link.download = 'kino-programa.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+            showNotification('JPG файлът е изтеглен!');
+        } catch (error) {
+            showNotification('Грешка при експорт на JPG: ' + error.message, 'error');
+        }
+    }
+    
+    function clearPrintPreview() {
+        document.getElementById('print-preview-container').innerHTML = '';
+        showNotification('Прегледът е изчистен!');
+    }
+    
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация на основни функции
+        loadDurationsFromStorage();
+        loadProgramFromStorage();
+        setupUI();
+        setupMovieSuggestions();
+        setupTabs();
+        setupDaySelector();
+        setupCopyFunctionality();
+        renderDurationList();
+        setupAddDurationButton();
+        setupAutoFill();
+        setupExampleProgram();
+        
+        ensureWeek(getWeekKeyForOffset(0));
+        ensureWeek(getWeekKeyForOffset(1));
+        renderHallInputs();
+        startLiveProgram();
+        setupEventListeners();
+        updateLiveProgram();
+        
+        // Зареждане на продължителности за оформление
+        if (localStorage.getItem('kinoDB')) {
+            printDurationsDB = JSON.parse(localStorage.getItem('kinoDB'));
+        }
+        
+        // Настройка на дати за оформление
+        const today = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(today.getDate() + 7);
+        
+        document.getElementById('print-date-from').value = today.toISOString().split('T')[0];
+        document.getElementById('print-date-to').value = nextWeek.toISOString().split('T')[0];
+        
+        // Автоматично запазване
+        setInterval(saveDurationsToStorage, 30000);
+        setInterval(saveProgramToStorage, 60000);
+        
+        // Показване на начално съобщение
+        setTimeout(() => {
+            showNotification('Добре дошли в кино програмата на Наско!', 'success');
+        }, 1000);
+    });
+    
+    // Правим някои функции достъпни глобално
+    window.addMovieEntry = addMovieEntry;
+    window.removeMovieEntry = removeMovieEntry;
+    window.updateProgram = updateProgram;
+    window.saveDuration = saveDuration;
+    window.generatePrintProgram = generatePrintProgram;
+    window.printProgram = printProgram;
+    window.exportAsPDF = exportAsPDF;
+    window.exportAsImage = exportAsImage;
+    window.clearPrintPreview = clearPrintPreview;
+    window.updatePrintScale = updatePrintScale;
+    </script>
+</body>
+</html>
