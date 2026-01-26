@@ -241,7 +241,7 @@
             border-radius: 8px;
         }
         
-        .time-input, .movie-input {
+        .time-input, .movie-input, .ad-input {
             padding: 10px;
             border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -256,6 +256,10 @@
         .movie-input {
             flex-grow: 1;
             min-width: 250px;
+        }
+        
+        .ad-input {
+            width: 120px;
         }
         
         .add-movie-btn, .save-btn, .load-btn, .edit-durations-btn {
@@ -367,7 +371,11 @@
             height: 100%;
             background: #f8b500;
             width: 0%;
-            transition: width 1s linear;
+            transition: width 1s linear, background 0.5s ease;
+        }
+        
+        .progress.ending-soon {
+            background: #ff8800;
         }
         
         .time-details {
@@ -425,25 +433,34 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .duration-movie {
             font-weight: bold;
-            flex-grow: 1;
+            flex: 1 1 200px;
+            min-width: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            margin-right: 10px;
         }
         
         .duration-input {
             width: 100px;
+            min-width: 100px;
+            flex-shrink: 0;
             padding: 8px;
             border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             background: rgba(0, 0, 0, 0.5);
             color: white;
-            margin-right: 10px;
         }
         
         .duration-save-btn {
             padding: 8px 15px;
+            min-width: 50px;
+            flex-shrink: 0;
             background: #00b894;
             color: white;
             border: none;
@@ -453,6 +470,22 @@
         
         .duration-save-btn:hover {
             background: #00d4a3;
+        }
+        
+        .duration-delete-btn {
+            padding: 8px 15px;
+            min-width: 50px;
+            flex-shrink: 0;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .duration-delete-btn:hover {
+            background: #ff6b81;
         }
         
         /* Стилове за оформление (компактни) */
@@ -814,7 +847,7 @@
                 align-items: flex-start;
             }
             
-            .time-input, .movie-input {
+            .time-input, .movie-input, .ad-input {
                 width: 100%;
             }
             
@@ -839,6 +872,35 @@
             .print-controls {
                 flex-direction: column;
                 align-items: center;
+            }
+        }
+        
+        @media print {
+            @page {
+                margin: 5mm;
+                size: A4;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            
+            .print-sheet {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                min-height: auto !important;
+            }
+            
+            .print-content {
+                padding: 10px 15px;
+            }
+            
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
         
@@ -890,7 +952,7 @@
     <div class="container">
         <header>
             <h1>🎬 Кино Програма</h1>
-            <p class="subtitle">Мониторинг & Оформление </p>
+            <p class="subtitle">Мониторинг & Оформление</p>
         </header>
         
         <div class="tabs">
@@ -962,14 +1024,20 @@
                 <!-- Автоматично попълване от текст -->
                 <div class="auto-fill-section">
                     <h3>Автоматично попълване от текст</h3>
-                    <textarea id="auto-fill-text" rows="10"></textarea>
+                    <textarea id="auto-fill-text" rows="10" placeholder="Зала 1 Уикенд
+12:00 - Филм 1 2D
+15:00 - Филм 2 3D /събота и неделя/
+
+Зала 1 Делник
+14:00 - Филм 3 2D
+17:30 - Филм 4 3D"></textarea>
                     <div class="auto-fill-buttons">
                         <button class="auto-fill-btn" id="auto-fill-weekend" style="background: #9b59b6;">Попълни Събота/Неделя</button>
                         <button class="auto-fill-btn" id="auto-fill-weekday" style="background: #3498db;">Попълни Пн-Пт (делник)</button>
                         <button class="auto-fill-btn" id="auto-fill-clear" style="background: #e74c3c;">Изчисти Всичко</button>
                     </div>
                     <p style="font-size: 0.9rem; color: #ccc; margin-top: 10px;">
-                        <strong>Забележка:</strong>Уикенд = събота и неделя<br>
+                        <strong>Забележка:</strong> Уикенд = събота и неделя<br>
                         Формат: Време - Филм (един ред за всеки филм). Групирайте по зали с заглавия "зала 1 уикенд", "зала 1 делник" и т.н.
                     </p>
                 </div>
@@ -1001,7 +1069,7 @@
                 
                 <div class="movie-entry">
                     <input type="text" id="new-movie-name" class="movie-input" placeholder="Име на нов филм">
-                    <input type="text" id="new-movie-duration" class="duration-input" placeholder="Дължина">
+                    <input type="text" id="new-movie-duration" class="duration-input" placeholder="Дължина (ч:м:с или м:с)">
                     <button class="add-movie-btn" id="add-duration">➕ Добави</button>
                 </div>
                 
@@ -1040,7 +1108,7 @@
                     <div class="format-control-group">
                         <label>Мащаб:</label>
                         <div class="scale-control">
-                            <input type="range" id="print-scale" class="scale-slider" min="0.8" max="2" step="0.1" value="1.3" oninput="updatePrintScale(this.value)">
+                            <input type="range" id="print-scale" class="scale-slider" min="0.5" max="2" step="0.01" value="1.3" oninput="updatePrintScale(this.value)">
                             <span id="scale-value">130%</span>
                         </div>
                     </div>
@@ -1085,10 +1153,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     
     <script>
-    // Комбиниран JavaScript код
-    // Всички функции от monitor.js + нови функции за оформление
-    
-    // ===== ЧАСТ 1: ОСНОВНИ ФУНКЦИИ ОТ MONITOR.JS =====
+    // ==== ЧАСТ 1: ОСНОВНИ ФУНКЦИИ ====
     
     // --- Utilities for week keys ---
     function getISOWeekKeyFromDate(date) {
@@ -1136,7 +1201,8 @@
     function parseDurationToSeconds(input) {
         if (input == null) return 0;
         if (typeof input === 'number') return Math.max(0, Math.floor(input));
-        input = input.toString().trim(); if (input === '') return 0;
+        input = input.toString().trim(); 
+        if (input === '') return 0;
         if (input.indexOf(':') >= 0) {
             const parts = input.split(':').map(p=>parseInt(p,10));
             if (parts.length === 3) return ((isNaN(parts[0])?0:parts[0])*3600) + ((isNaN(parts[1])?0:parts[1])*60) + (isNaN(parts[2])?0:parts[2]);
@@ -1185,67 +1251,41 @@
         }
     }
     
-    // --- Rendering / UI ---
-    function setupUI() {
-        const weekBtns = document.querySelectorAll('.week-btn');
-        weekBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                selectedWeekOffset = parseInt(this.getAttribute('data-week'), 10);
-                renderHallInputs();
-            });
-        });
-        
-        const importFileInput = document.getElementById('import-file');
-        const importBtn = document.getElementById('import-btn');
-        const exportBtn = document.getElementById('export-btn');
-        
-        if (exportBtn) {
-            exportBtn.addEventListener('click', exportData);
+    // --- Валидация на време ---
+    function validateTimeInput(timeStr) {
+        // Приема формат HH:MM (24 часа)
+        const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+        if (timeRegex.test(timeStr)) {
+            // Добавя водеща нула ако е нужно
+            const parts = timeStr.split(':');
+            const hours = parts[0].padStart(2, '0');
+            const minutes = parts[1];
+            return `${hours}:${minutes}`;
         }
-        
-        if (importBtn) {
-            importBtn.addEventListener('click', () => {
-                if (importFileInput) importFileInput.click();
-            });
-        }
-        
-        if (importFileInput) {
-            importFileInput.addEventListener('change', function(e) {
-                const f = e.target.files[0];
-                if (f) {
-                    const r = new FileReader();
-                    r.onload = () => {
-                        try {
-                            const parsed = JSON.parse(r.result);
-                            importData(parsed);
-                            showNotification('Данните са импортирани успешно!');
-                        } catch(err) {
-                            showNotification('Невалиден JSON файл', 'error');
-                        }
-                    };
-                    r.readAsText(f);
-                }
-            });
-        }
+        return null;
     }
     
+    // --- Rendering / UI ---
     function renderHallInputs() {
         const weekKey = getWeekKeyForOffset(selectedWeekOffset);
         ensureWeek(weekKey);
         const hallInputsContainer = document.getElementById('hall-inputs');
         hallInputsContainer.innerHTML = '';
         const dayTitle = document.createElement('h3');
-        dayTitle.style.color = '#f8b500'; dayTitle.style.marginBottom = '20px'; dayTitle.style.fontSize = '1.8rem';
+        dayTitle.style.color = '#f8b500'; 
+        dayTitle.style.marginBottom = '20px'; 
+        dayTitle.style.fontSize = '1.8rem';
         dayTitle.textContent = `Програма за ${daysOfWeek[selectedDay]} (${weekKey})`;
         hallInputsContainer.appendChild(dayTitle);
     
         const makeHall = (hallKey, title) => {
             let html = `<div class="hall-section"><div class="hall-title">${title}</div><div id="${hallKey}-movies">`;
-            weeklyProgram[weekKey][selectedDay][hallKey].forEach((movie, index) => {
-                html += createMovieEntryHTML(hallKey, index, movie.time || '', movie.name || '', movie.ad || 0);
-            });
+            const movies = weeklyProgram[weekKey][selectedDay][hallKey];
+            if (movies && movies.length > 0) {
+                movies.forEach((movie, index) => {
+                    html += createMovieEntryHTML(hallKey, index, movie.time || '', movie.name || '', movie.ad || 0);
+                });
+            }
             html += `</div><button class="add-movie-btn" onclick="addMovieEntry('${hallKey}')">➕ Добави филм</button></div>`;
             return html;
         };
@@ -1257,12 +1297,31 @@
         const adDisplay = adSeconds ? formatTimeFromSeconds(adSeconds) : '';
         return `
             <div class="movie-entry" id="${hall}-movie-${index}">
-                <input type="time" class="time-input" value="${time}" onchange="updateProgram('${hall}', ${index}, 'time', this.value)">
-                <input type="text" class="movie-input" value="${name}" placeholder="Име на филм" list="movie-suggestions" onchange="updateProgram('${hall}', ${index}, 'name', this.value)">
-                <input type="text" class="duration-input" placeholder="Рекламен блок (м:с или ч:м:с)" value="${adDisplay}" onchange="updateProgram('${hall}', ${index}, 'ad', this.value)" style="width:120px;">
+                <input type="text" class="time-input" value="${time}" placeholder="HH:MM (24ч)" 
+                       onchange="updateProgram('${hall}', ${index}, 'time', this.value)"
+                       onblur="validateTimeField(this)">
+                <input type="text" class="movie-input" value="${name}" placeholder="Име на филм" 
+                       list="movie-suggestions" 
+                       onchange="updateProgram('${hall}', ${index}, 'name', this.value)">
+                <input type="text" class="ad-input" placeholder="Реклами (м:с)" 
+                       value="${adDisplay}" 
+                       onchange="updateProgram('${hall}', ${index}, 'ad', this.value)">
                 <button class="remove-btn" onclick="removeMovieEntry('${hall}', ${index})">❌ Премахни</button>
             </div>
         `;
+    }
+    
+    function validateTimeField(input) {
+        const validated = validateTimeInput(input.value);
+        if (validated) {
+            input.value = validated;
+        } else if (input.value.trim() !== '') {
+            input.style.borderColor = '#ff4757';
+            setTimeout(() => {
+                input.style.borderColor = '';
+                input.focus();
+            }, 1000);
+        }
     }
     
     function addMovieEntry(hall) {
@@ -1272,24 +1331,44 @@
         const newIndex = movies.length;
         movies.push({ time: '', name: '', ad: 0 });
         renderHallInputs();
-        setTimeout(() => { const newInput = document.querySelector(`#${hall}-movie-${newIndex} .movie-input`); if (newInput) newInput.focus(); }, 100);
+        setTimeout(() => { 
+            const newInput = document.querySelector(`#${hall}-movie-${newIndex} .time-input`); 
+            if (newInput) newInput.focus(); 
+        }, 100);
     }
     
     function removeMovieEntry(hall, index) { 
         const weekKey = getWeekKeyForOffset(selectedWeekOffset); 
         weeklyProgram[weekKey][selectedDay][hall].splice(index,1); 
         renderHallInputs(); 
+        saveProgramToStorage();
     }
     
     function updateProgram(hall, index, field, value) {
         const weekKey = getWeekKeyForOffset(selectedWeekOffset);
         ensureWeek(weekKey);
-        if (!weeklyProgram[weekKey][selectedDay][hall][index]) weeklyProgram[weekKey][selectedDay][hall][index] = {};
+        
+        // Ensure the array exists
+        if (!weeklyProgram[weekKey][selectedDay][hall]) {
+            weeklyProgram[weekKey][selectedDay][hall] = [];
+        }
+        
+        // Ensure the movie object exists
+        if (!weeklyProgram[weekKey][selectedDay][hall][index]) {
+            weeklyProgram[weekKey][selectedDay][hall][index] = {};
+        }
+        
         if (field === 'ad') {
             weeklyProgram[weekKey][selectedDay][hall][index][field] = parseDurationToSeconds(value);
+        } else if (field === 'time') {
+            // Валидираме времето
+            const validated = validateTimeInput(value);
+            weeklyProgram[weekKey][selectedDay][hall][index][field] = validated || value;
         } else {
             weeklyProgram[weekKey][selectedDay][hall][index][field] = value;
         }
+        
+        saveProgramToStorage();
     }
     
     // --- Durations UI ---
@@ -1302,25 +1381,45 @@
             const durationItem = document.createElement('div');
             durationItem.className = 'duration-item';
             const valueStr = formatTimeFromSeconds(movieDurations[movieName] || 0);
-            durationItem.innerHTML = `<div class="duration-movie">${movieName}</div><input type="text" class="duration-input" value="${valueStr}" data-movie="${movieName}"><button class="duration-save-btn" onclick="saveDuration('${movieName}', this.previousElementSibling.value)">💾</button>`;
+            durationItem.innerHTML = `
+                <div class="duration-movie">${movieName}</div>
+                <input type="text" class="duration-input" value="${valueStr}" data-movie="${movieName}">
+                <button class="duration-save-btn" onclick="saveDuration('${movieName}', this.previousElementSibling.value)">💾</button>
+                <button class="duration-delete-btn" onclick="deleteDuration('${movieName}')">🗑️</button>
+            `;
             durationList.appendChild(durationItem);
         });
     }
     
     function saveDuration(movieName, durationInput) {
         const seconds = parseDurationToSeconds(durationInput);
-        if (seconds <= 0) { showNotification('Моля, въведете валидна дължина!', 'error'); return; }
+        if (seconds <= 0) { 
+            showNotification('Моля, въведете валидна дължина!', 'error'); 
+            return; 
+        }
         movieDurations[movieName] = seconds;
         saveDurationsToStorage();
         renderDurationList();
         showNotification(`Дължината на "${movieName}" е запазена (${formatDuration(seconds)})!`);
     }
     
+    function deleteDuration(movieName) {
+        if (confirm(`Сигурни ли сте, че искате да изтриете "${movieName}" от списъка?`)) {
+            delete movieDurations[movieName];
+            saveDurationsToStorage();
+            renderDurationList();
+            showNotification(`"${movieName}" е изтрит от списъка!`);
+        }
+    }
+    
     function setupAddDurationButton() {
         document.getElementById('add-duration')?.addEventListener('click', function() {
             const movieName = document.getElementById('new-movie-name').value.trim();
             const duration = document.getElementById('new-movie-duration').value;
-            if (!movieName) { showNotification('Моля, въведете име на филм!', 'error'); return; }
+            if (!movieName) { 
+                showNotification('Моля, въведете име на филм!', 'error'); 
+                return; 
+            }
             movieDurations[movieName] = parseDurationToSeconds(duration);
             saveDurationsToStorage();
             renderDurationList();
@@ -1331,12 +1430,10 @@
     }
     
     // --- Sound alert functions ---
-    let lastMovieId = null; // За проследяване на кой филм е активен
-    let movieStartAlerts = {}; // За проследяване на филми, които са изпълнили стартовия сигнал
-    let movieEndAlerts = {}; // За проследяване на филми, които са изпълнили сигнала за край
+    let movieStartAlerts = {};
+    let movieEndAlerts = {};
     
     function playStartSound() {
-        // Стартов звук - бърз и светъл звук (биберон подобен на часовник)
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const now = audioContext.currentTime;
         const oscillator = audioContext.createOscillator();
@@ -1345,7 +1442,6 @@
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        // Три бърза издумки за стартов звук
         oscillator.frequency.setValueAtTime(800, now);
         gainNode.gain.setValueAtTime(0.8, now);
         oscillator.frequency.setValueAtTime(1000, now + 0.1);
@@ -1358,7 +1454,6 @@
     }
     
     function playEndSound() {
-        // Звук за край - по-нисък и по-траен (предупреждаващ звук)
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const now = audioContext.currentTime;
         const oscillator = audioContext.createOscillator();
@@ -1367,7 +1462,6 @@
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        // Два по-нискочестотни издумки
         oscillator.frequency.setValueAtTime(300, now);
         gainNode.gain.setValueAtTime(0.8, now);
         oscillator.frequency.setValueAtTime(250, now + 0.2);
@@ -1391,7 +1485,7 @@
         const todayProgram = weeklyProgram[currentWeekKey] || {};
         const liveContainer = document.getElementById('live-program-container');
     
-        if (!todayProgram || Object.keys(todayProgram).length === 0) {
+        if (!todayProgram || Object.keys(todayProgram).length === 0 || !todayProgram[dayKey]) {
             liveContainer.innerHTML = '<div class="hall-display" style="grid-column: 1/-1; text-align: center; padding: 40px;"><h2>Няма програма за днес</h2><p>Моля, въведете програма в раздела "Въвеждане на Програма"</p></div>';
             return;
         }
@@ -1399,11 +1493,17 @@
         let html = '';
         for (const [hallKey, hallName] of [['hall1','Зала 1'],['hall2','Зала 2'],['hallLux','Зала ЛУКС']]) {
             const movies = (todayProgram[dayKey] && todayProgram[dayKey][hallKey]) ? todayProgram[dayKey][hallKey] : [];
-            if (!movies || movies.length === 0) { html += `<div class="hall-display"><div class="hall-header"><div class="hall-name">${hallName}</div><div class="current-time">${formatTime(now)}</div></div><div class="now-playing"><div class="movie-title">Няма програма за днес</div><div class="time-info">${daysOfWeek[dayKey]}</div></div></div>`; continue; }
+            if (!movies || movies.length === 0) { 
+                html += `<div class="hall-display"><div class="hall-header"><div class="hall-name">${hallName}</div><div class="current-time">${formatTime(now)}</div></div><div class="now-playing"><div class="movie-title">Няма програма за днес</div><div class="time-info">${daysOfWeek[dayKey]}</div></div></div>`; 
+                continue; 
+            }
     
             let currentMovie = null, nextMovie = null, currentProgress = 0, timeElapsed = 0, timeRemaining = 0;
             for (let i=0;i<movies.length;i++) {
-                const movie = movies[i]; if (!movie.time || !movie.name) continue;
+                const movie = movies[i]; 
+                if (!movie.time || !movie.name) continue;
+                
+                // Парсване на времето (поддържаме и HH:MM и HH:mm)
                 const [hours, minutes] = movie.time.split(':').map(Number);
                 const movieStartTime = (hours||0)*3600 + (minutes||0)*60;
                 const movieDuration = movieDurations[movie.name] || (120*60);
@@ -1418,39 +1518,60 @@
                     currentProgress = (timeElapsed / (movieDuration + adSeconds)) * 100;
                     if (i+1 < movies.length) nextMovie = movies[i+1];
                     break;
-                } else if (currentTime < movieStartTime) { nextMovie = movie; break; }
+                } else if (currentTime < movieStartTime) { 
+                    nextMovie = movie; 
+                    break; 
+                }
             }
     
             if (!currentMovie && !nextMovie && movies.length>0) {
-                for (let i=0;i<movies.length;i++) { if (movies[i].time && movies[i].name) { const [h,m] = movies[i].time.split(':').map(Number); const movieStart=(h||0)*3600+(m||0)*60; if (movieStart>currentTime) { nextMovie = movies[i]; break; } }}
+                for (let i=0;i<movies.length;i++) { 
+                    if (movies[i].time && movies[i].name) { 
+                        const [h,m] = movies[i].time.split(':').map(Number); 
+                        const movieStart=(h||0)*3600+(m||0)*60; 
+                        if (movieStart>currentTime) { 
+                            nextMovie = movies[i]; 
+                            break; 
+                        } 
+                    }
+                }
             }
     
             html += `<div class="hall-display"><div class="hall-header"><div class="hall-name">${hallName}</div><div class="current-time">${formatTime(now)}</div></div><div class="day-indicator" style="margin-bottom:15px;color:#f8b500;font-size:1.1rem;">${daysOfWeek[dayKey]}</div>`;
     
             if (currentMovie) {
-                html += `<div class="now-playing"><div class="movie-title">${currentMovie.name}</div><div class="time-info">${formatDuration(timeElapsed)} / ${formatDuration(currentMovie.duration)}</div><div class="progress-bar"><div class="progress" style="width: ${currentProgress}%"></div></div><div class="time-details"><span>Започна: ${formatTimeFromSecondsNoSec(currentMovie.startTime)}</span><span>Свършва: ${formatTimeFromSecondsNoSec(currentMovie.endTime)}</span></div><div class="time-details"><span>Свършва: ${formatTimeFromSecondsNoSec(currentMovie.endWithAds)}</span><span>Остава: ${formatDuration(timeRemaining)}</span></div></div>`;
+                const secondsUntilEnd = currentMovie.endWithAds - currentTime;
+                const progressClass = (secondsUntilEnd <= 300) ? 'ending-soon' : '';
                 
-                // Проверка за звукови сигнали
+                html += `<div class="now-playing">
+                    <div class="movie-title">${currentMovie.name}</div>
+                    <div class="time-info">${formatDuration(timeElapsed)} / ${formatDuration(currentMovie.duration + currentMovie.ad)}</div>
+                    <div class="progress-bar"><div class="progress ${progressClass}" style="width: ${currentProgress}%"></div></div>
+                    <div class="time-details"><span>Започна: ${formatTimeFromSecondsNoSec(currentMovie.startTime)}</span><span>Свършва: ${formatTimeFromSecondsNoSec(currentMovie.endTime)}</span></div>
+                    <div class="time-details"><span>С реклами: ${formatTimeFromSecondsNoSec(currentMovie.endWithAds)}</span><span>Остава: ${formatDuration(timeRemaining)}</span></div>
+                </div>`;
+                
                 const movieId = hallKey + '-' + currentMovie.startTime + '-' + currentMovie.name;
                 
-                // Сигнал при започване на филм
                 if (timeElapsed >= 0 && timeElapsed < 2 && !movieStartAlerts[movieId]) {
                     playStartSound();
                     movieStartAlerts[movieId] = true;
                     showNotification(`🎬 Филмът "${currentMovie.name}" започна!`);
                 }
                 
-                // Сигнал минута преди свършване на филм
-                const secondsUntilEnd = currentMovie.endWithAds - currentTime;
                 if (secondsUntilEnd > 55 && secondsUntilEnd <= 60 && !movieEndAlerts[movieId]) {
                     playEndSound();
                     movieEndAlerts[movieId] = true;
                     showNotification(`⏰ Филмът "${currentMovie.name}" свършва в 1 минута!`);
                 }
-            } else { html += `<div class="now-playing"><div class="movie-title">В момента няма прожекция</div></div>`; }
+            } else { 
+                html += `<div class="now-playing"><div class="movie-title">В момента няма прожекция</div></div>`; 
+            }
     
             if (nextMovie) {
-                const [nh,nm] = nextMovie.time.split(':').map(Number); const nextStart=(nh||0)*3600+(nm||0)*60; const timeUntilNext = nextStart - currentTime;
+                const [nh,nm] = nextMovie.time.split(':').map(Number); 
+                const nextStart=(nh||0)*3600+(nm||0)*60; 
+                const timeUntilNext = nextStart - currentTime;
                 html += `<div class="next-movie"><div class="next-label">Следва</div><div class="next-title">${nextMovie.name}</div><div class="next-time">${nextMovie.time} (започва след ${formatDuration(timeUntilNext)})</div></div>`;
             }
     
@@ -1460,28 +1581,88 @@
         liveContainer.innerHTML = html;
     }
     
-    function startLiveProgram() { if (liveUpdateInterval) clearInterval(liveUpdateInterval); updateLiveProgram(); liveUpdateInterval = setInterval(updateLiveProgram, 1000); }
-    function stopLiveProgram() { if (liveUpdateInterval) { clearInterval(liveUpdateInterval); liveUpdateInterval = null; } }
+    function startLiveProgram() { 
+        if (liveUpdateInterval) clearInterval(liveUpdateInterval); 
+        updateLiveProgram(); 
+        liveUpdateInterval = setInterval(updateLiveProgram, 1000); 
+    }
+    
+    function stopLiveProgram() { 
+        if (liveUpdateInterval) { 
+            clearInterval(liveUpdateInterval); 
+            liveUpdateInterval = null; 
+        } 
+    }
     
     function setupEventListeners() {
-        document.getElementById('save-program')?.addEventListener('click', function(){ saveProgramToStorage(); showNotification('Програмата е запазена успешно!'); });
-        document.getElementById('load-program')?.addEventListener('click', function(){ loadProgramFromStorage(); renderHallInputs(); showNotification('Програмата е заредена успешно!'); });
-        document.getElementById('go-to-durations')?.addEventListener('click', function(){ switchTab('durations'); });
-        document.getElementById('go-to-input')?.addEventListener('click', function(){ switchTab('input'); });
-        document.addEventListener('keydown', function(e){ if (e.target.classList.contains('duration-input') && e.key === 'Enter') { const movieName = e.target.getAttribute('data-movie'); if (movieName) saveDuration(movieName, e.target.value); } });
-        document.querySelectorAll('.day-btn').forEach(btn=>{ btn.addEventListener('click', function(){ document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active'); selectedDay = this.getAttribute('data-day'); document.getElementById('copy-from').value = selectedDay; renderHallInputs(); }); });
+        document.getElementById('save-program')?.addEventListener('click', function(){ 
+            saveProgramToStorage(); 
+            showNotification('Програмата е запазена успешно!'); 
+        });
         
-        // Слушател за промяна на ориентацията
-        document.getElementById('print-orientation')?.addEventListener('change', function() {
-            const sheet = document.querySelector('.print-sheet');
-            if (sheet) {
-                sheet.classList.remove('portrait', 'landscape');
-                sheet.classList.add(this.value);
+        document.getElementById('load-program')?.addEventListener('click', function(){ 
+            loadProgramFromStorage(); 
+            renderHallInputs(); 
+            showNotification('Програмата е заредена успешно!'); 
+        });
+        
+        document.getElementById('go-to-durations')?.addEventListener('click', function(){ 
+            switchTab('durations'); 
+        });
+        
+        document.getElementById('go-to-input')?.addEventListener('click', function(){ 
+            switchTab('input'); 
+        });
+        
+        document.getElementById('save-durations')?.addEventListener('click', function(){ 
+            saveDurationsToStorage(); 
+            showNotification('Дължините са запазени успешно!'); 
+        });
+        
+        document.addEventListener('keydown', function(e){ 
+            if (e.target.classList.contains('duration-input') && e.key === 'Enter') { 
+                const movieName = e.target.getAttribute('data-movie'); 
+                if (movieName) saveDuration(movieName, e.target.value); 
+            } 
+        });
+        
+        document.querySelectorAll('.day-btn').forEach(btn=>{ 
+            btn.addEventListener('click', function(){ 
+                document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active')); 
+                this.classList.add('active'); 
+                selectedDay = this.getAttribute('data-day'); 
+                document.getElementById('copy-from').value = selectedDay; 
+                renderHallInputs(); 
+            }); 
+        });
+        
+        // Експорт/импорт
+        document.getElementById('export-btn')?.addEventListener('click', exportData);
+        document.getElementById('import-btn')?.addEventListener('click', () => {
+            document.getElementById('import-file').click();
+        });
+        
+        document.getElementById('import-file')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        importData(data);
+                        showNotification('Данните са импортирани успешно!');
+                    } catch (error) {
+                        showNotification('Грешка при четене на файла', 'error');
+                    }
+                };
+                reader.readAsText(file);
             }
         });
     }
     
-    function formatTime(date) { return date.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' }); }
+    function formatTime(date) { 
+        return date.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' }); 
+    }
     
     function showNotification(message, type = 'success') { 
         const notification = document.getElementById('notification'); 
@@ -1497,6 +1678,7 @@
     function saveDurationsToStorage() { 
         try { 
             localStorage.setItem('cinemaMovieDurations', JSON.stringify(movieDurations)); 
+            localStorage.setItem('kinoDB', JSON.stringify(movieDurations)); // За оформлението
             return true; 
         } catch(e) { 
             console.error('Грешка при запазване на дължините:', e); 
@@ -1626,6 +1808,9 @@
                     ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                 
                 targetDays.forEach(day => {
+                    if (!weeklyProgram[weekKey][day][currentHall]) {
+                        weeklyProgram[weekKey][day][currentHall] = [];
+                    }
                     weeklyProgram[weekKey][day][currentHall].push({
                         time: time,
                         name: movie,
@@ -1651,18 +1836,19 @@
         saveProgramToStorage();
     }
     
-    function setupExampleProgram() {
-        // Пример програма премахнета
-    }
-    
     // Export / Import
     function exportData() {
-        const data = { movieDurations, weeklyProgram };
+        const data = { 
+            movieDurations, 
+            weeklyProgram,
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); 
         a.href = url; 
-        a.download = 'cinema-program-export.json'; 
+        a.download = 'cinema-program-export-' + new Date().toISOString().slice(0,10) + '.json'; 
         document.body.appendChild(a); 
         a.click(); 
         a.remove(); 
@@ -1736,23 +1922,28 @@
             const fromDay = document.getElementById('copy-from').value;
             const toDay = document.getElementById('copy-to').value;
             const weekKey = getWeekKeyForOffset(selectedWeekOffset);
+            
             if (fromDay === toDay) { 
                 showNotification('Не можете да копирате програмата в същия ден!', 'error'); 
                 return; 
             }
+            
             if (!confirm(`Копиране от ${daysOfWeek[fromDay]} в ${daysOfWeek[toDay]} за седмица ${weekKey}?`)) return;
+            
             ensureWeek(weekKey);
-            for (const hall of ['hall1','hall2','hallLux']) 
+            for (const hall of ['hall1','hall2','hallLux']) {
                 weeklyProgram[weekKey][toDay][hall] = JSON.parse(JSON.stringify(weeklyProgram[weekKey][fromDay][hall]));
+            }
+            
             renderHallInputs(); 
             saveProgramToStorage(); 
             showNotification('Копиране успешно!');
         });
     }
     
-    // ===== ЧАСТ 2: ФУНКЦИИ ЗА ОФОРМЛЕНИЕ =====
+    // ==== ЧАСТ 2: ФУНКЦИИ ЗА ОФОРМЛЕНИЕ ====
     
-    let printDurationsDB = JSON.parse(localStorage.getItem('kinoDB') || '{}');
+    let printDurationsDB = {};
     
     function updatePrintScale(value) {
         const scaleValue = parseFloat(value);
@@ -1800,9 +1991,9 @@
                 const fmt = (fullTitle.match(/\b(2D|3D|2Д|3Д)\b/i) || [""])[0].toUpperCase().replace('Д','D');
                 
                 let cleanTitle = fullTitle.replace(/\b(2D|3D|2Д|3Д)\b/i, '')
-                                         .replace(/\/събота и неделя\//gi, '')
-                                         .replace(/\s*дуб\.?/i, '')
-                                         .trim();
+                    .replace(/\/събота и неделя\//gi, '')
+                    .replace(/\s*дуб\.?/i, '')
+                    .trim();
                 
                 const key = cleanTitle + '|' + fmt + '|' + weekendOnly;
                 
@@ -1848,8 +2039,8 @@
         const to = document.getElementById('print-date-to').value;
         const orientation = document.getElementById('print-orientation').value;
         
-        const fromText = from || "начална дата";
-        const toText = to || "крайна дата";
+        const fromText = from ? new Date(from).toLocaleDateString('bg-BG') : "начална дата";
+        const toText = to ? new Date(to).toLocaleDateString('bg-BG') : "крайна дата";
         
         let html = `<div class="print-sheet ${orientation}">
             <div class="print-content scaled">
@@ -1875,7 +2066,7 @@
                 });
                 
                 films.forEach(f => {
-                    const dur = printDurationsDB[f.title] || "";
+                    const dur = printDurationsDB[f.title] ? formatDuration(printDurationsDB[f.title]) : "";
                     
                     html += `<div class="print-film">`;
                     
@@ -2012,6 +2203,11 @@
                         .print-movie-meta {
                             font-size: 10pt;
                         }
+                        
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
                     }
                 </style>
             </head>
@@ -2043,7 +2239,7 @@
                 scale: 2,
                 backgroundColor: '#ffffff'
             });
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
             
             const { jsPDF } = window.jspdf;
             const orientation = document.getElementById('print-orientation').value;
@@ -2053,13 +2249,17 @@
                 format: 'a4'
             });
             
-            const imgWidth = 190;
+            const pageWidth = orientation === 'landscape' ? 297 : 210;
+            const pageHeight = orientation === 'landscape' ? 210 : 297;
+            
+            const imgWidth = pageWidth - 20; // 10mm margin from each side
             const imgHeight = canvas.height * imgWidth / canvas.width;
-            const xPos = (210 - imgWidth) / 2;
-            const yPos = (297 - imgHeight) / 2;
+            
+            const xPos = (pageWidth - imgWidth) / 2;
+            const yPos = (pageHeight - imgHeight) / 2;
             
             pdf.addImage(imgData, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-            pdf.save('kino-programa.pdf');
+            pdf.save('kino-programa-' + new Date().toISOString().slice(0,10) + '.pdf');
             showNotification('PDF файлът е изтеглен!');
         } catch (error) {
             showNotification('Грешка при експорт на PDF: ' + error.message, 'error');
@@ -2079,8 +2279,8 @@
                 backgroundColor: '#ffffff'
             });
             const link = document.createElement('a');
-            link.download = 'kino-programa.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.download = 'kino-programa-' + new Date().toISOString().slice(0,10) + '.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
             showNotification('JPG файлът е изтеглен!');
         } catch (error) {
@@ -2093,12 +2293,13 @@
         showNotification('Прегледът е изчистен!');
     }
     
-    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    // ==== ИНИЦИАЛИЗАЦИЯ ====
     document.addEventListener('DOMContentLoaded', function() {
-        // Инициализация на основни функции
+        // Зареждане на данни
         loadDurationsFromStorage();
         loadProgramFromStorage();
-        setupUI();
+        
+        // Настройка на UI компоненти
         setupMovieSuggestions();
         setupTabs();
         setupDaySelector();
@@ -2106,18 +2307,20 @@
         renderDurationList();
         setupAddDurationButton();
         setupAutoFill();
-        setupExampleProgram();
+        setupEventListeners();
         
+        // Инициализация на седмици
         ensureWeek(getWeekKeyForOffset(0));
         ensureWeek(getWeekKeyForOffset(1));
+        
+        // Рендериране на UI
         renderHallInputs();
-        startLiveProgram();
-        setupEventListeners();
-        updateLiveProgram();
         
         // Зареждане на продължителности за оформление
         if (localStorage.getItem('kinoDB')) {
             printDurationsDB = JSON.parse(localStorage.getItem('kinoDB'));
+        } else {
+            printDurationsDB = movieDurations;
         }
         
         // Настройка на дати за оформление
@@ -2128,21 +2331,25 @@
         document.getElementById('print-date-from').value = today.toISOString().split('T')[0];
         document.getElementById('print-date-to').value = nextWeek.toISOString().split('T')[0];
         
+        // Стартиране на живата програма
+        startLiveProgram();
+        
         // Автоматично запазване
         setInterval(saveDurationsToStorage, 30000);
         setInterval(saveProgramToStorage, 60000);
         
         // Показване на начално съобщение
         setTimeout(() => {
-            showNotification('Добре дошли в кино програмата на Наско!', 'success');
+            showNotification('Добре дошли в кино програмата! Всички промени се запазват автоматично.', 'success');
         }, 1000);
     });
     
-    // Правим някои функции достъпни глобално
+    // Правим функциите достъпни глобално
     window.addMovieEntry = addMovieEntry;
     window.removeMovieEntry = removeMovieEntry;
     window.updateProgram = updateProgram;
     window.saveDuration = saveDuration;
+    window.deleteDuration = deleteDuration;
     window.generatePrintProgram = generatePrintProgram;
     window.printProgram = printProgram;
     window.exportAsPDF = exportAsPDF;
